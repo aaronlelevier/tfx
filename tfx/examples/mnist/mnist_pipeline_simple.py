@@ -24,8 +24,9 @@ from tfx.components.example_gen.mnist_example_gen.component import \
 from tfx.orchestration.airflow.airflow_runner import AirflowDAGRunner
 from tfx.orchestration.pipeline import PipelineDecorator
 from tfx.utils.dsl_utils import csv_input
+from tfx.orchestration import pipeline
 
-_data_root = '/tmp/data/mnist/val/'
+_data_root = '/tmp/data/mnist/val'
 
 # Directory and data locations.  This example assumes all of the chicago taxi
 # example code and metadata library is relative to $HOME, but you can store
@@ -42,26 +43,30 @@ _airflow_config = {
 }
 
 # Logging overrides
-logger_overrides = {
-    'log_root': _log_root,
-    'log_level': logging.INFO
-}
+logger_overrides = {'log_root': _log_root, 'log_level': logging.INFO}
 
 
-@PipelineDecorator(
-    pipeline_name='chicago_taxi_simple',
-    enable_cache=True,
-    metadata_db_root=_metadata_db_root,
-    additional_pipeline_args={'logger_args': logger_overrides},
-    pipeline_root=_pipeline_root)
 def _create_pipeline():
   """Implements the chicago taxi pipeline with TFX."""
+
+  # set file path for data
   examples = csv_input(_data_root)
 
   # Brings data into the pipeline or otherwise joins/converts training data.
+  # files will be output to:
+  #   ~/tfx/pipelines/mnist/MnistExampleGen/examples/<run_number/<split>/
   example_gen = MnistExampleGen(input_base=examples)
 
-  return [example_gen]
+  return pipeline.Pipeline(
+      pipeline_name='mnist',
+      pipeline_root=_pipeline_root,
+      components=[
+          example_gen
+      ],
+      enable_cache=True,
+      metadata_db_root=_metadata_db_root,
+      additional_pipeline_args={'logger_args': logger_overrides},
+  )
 
 
 pipeline = AirflowDAGRunner(_airflow_config).run(_create_pipeline())

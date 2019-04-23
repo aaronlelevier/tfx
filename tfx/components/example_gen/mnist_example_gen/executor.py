@@ -25,6 +25,8 @@ from logzero import logger
 from tensorflow.python.platform import gfile
 
 from tfx.components.example_gen import base_example_gen_executor
+from tfx.utils import types
+
 
 tf.enable_eager_execution()
 
@@ -50,8 +52,9 @@ class Executor(base_example_gen_executor.BaseExampleGenExecutor):
 @beam.ptransform_fn
 @beam.typehints.with_input_types(beam.Pipeline)
 @beam.typehints.with_output_types(tf.train.Example)
-def _ImageToExample(pipeline, input_dict):
-  data_dir = input_dict['input-base']
+def _ImageToExample(pipeline, input_dict, exec_properties):
+  input_base = types.get_single_instance(input_dict['input-base'])
+  data_dir = input_base.uri
 
   images_path = os.path.join(data_dir, 'images.gz')
   labels_path = os.path.join(data_dir, 'labels.gz')

@@ -1,2 +1,8 @@
+# airflow]
+export SLUGIFY_USES_TEXT_UNIDECODE=yes
+apache-airflow
+
+# mnist
 logzero
 pylint
+yapf

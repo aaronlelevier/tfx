@@ -18,8 +18,10 @@ from __future__ import absolute_import, division, print_function
 from typing import Any, Dict, Optional, Text
 
 from tfx.components.base import base_component
+from tfx.components.example_gen import utils
 from tfx.components.example_gen.mnist_example_gen import driver, executor
 from tfx.utils import channel, types
+from google.protobuf import json_format
 
 
 class MnistExampleGen(base_component.BaseComponent):
@@ -41,11 +43,14 @@ class MnistExampleGen(base_component.BaseComponent):
 
   def __init__(self,
                input_base,
+               # TODO(jyzhao): add documentation about input/output config.
+               output_config = None,
                name = None,
                outputs = None):
     component_name = 'MnistExampleGen'
     input_dict = {'input-base': channel.as_channel(input_base)}
-    exec_properties = {}
+    self._output_config = output_config or utils.get_default_output_config()
+    exec_properties = {'output': json_format.MessageToJson(self._output_config)}
     super(MnistExampleGen, self).__init__(
         component_name=component_name,
         unique_name=name,
