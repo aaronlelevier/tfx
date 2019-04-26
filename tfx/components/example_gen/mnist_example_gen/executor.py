@@ -27,7 +27,6 @@ from tensorflow.python.platform import gfile
 from tfx.components.example_gen import base_example_gen_executor
 from tfx.utils import types
 
-
 tf.enable_eager_execution()
 
 TFRECORD_OUTFILE = 'mnist'
@@ -65,8 +64,8 @@ def _ImageToExample(pipeline, input_dict, exec_properties):
       images, labels)
 
   # Beam Pipeline
-  image_line = pipeline | "CreateImage" >> beam.Create(images_w_index[:1])
-  label_line = pipeline | "CreateLabel" >> beam.Create(labels_w_index[:1])
+  image_line = pipeline | "CreateImage" >> beam.Create(images_w_index)
+  label_line = pipeline | "CreateLabel" >> beam.Create(labels_w_index)
   group_by = ({'label': label_line, 'image': image_line}) | beam.CoGroupByKey()
   return group_by | "GroupByToTfExample" >> beam.Map(group_by_tf_example)
 

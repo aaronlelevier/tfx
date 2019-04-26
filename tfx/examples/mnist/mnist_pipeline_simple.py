@@ -21,10 +21,12 @@ import os
 
 from tfx.components.example_gen.mnist_example_gen.component import \
     MnistExampleGen
-from tfx.orchestration.airflow.airflow_runner import AirflowDAGRunner
-from tfx.orchestration.pipeline import PipelineDecorator
-from tfx.utils.dsl_utils import csv_input
+from tfx.components.example_validator.component import ExampleValidator
+from tfx.components.schema_gen.component import SchemaGen
+from tfx.components.statistics_gen.component import StatisticsGen
 from tfx.orchestration import pipeline
+from tfx.orchestration.airflow.airflow_runner import AirflowDAGRunner
+from tfx.utils.dsl_utils import csv_input
 
 _data_root = '/tmp/data/mnist/val'
 
@@ -57,11 +59,24 @@ def _create_pipeline():
   #   ~/tfx/pipelines/mnist/MnistExampleGen/examples/<run_number/<split>/
   example_gen = MnistExampleGen(input_base=examples)
 
+  # Computes statistics over data for visualization and example validation.
+  statistics_gen = StatisticsGen(input_data=example_gen.outputs.examples)
+
+  # # Generates schema based on statistics files.
+  # infer_schema = SchemaGen(stats=statistics_gen.outputs.output)
+
+  # # Performs anomaly detection based on statistics and data schema.
+  # validate_stats = ExampleValidator(
+  #     stats=statistics_gen.outputs.output, schema=infer_schema.outputs.output)
+
   return pipeline.Pipeline(
       pipeline_name='mnist',
       pipeline_root=_pipeline_root,
       components=[
-          example_gen
+          example_gen,
+          statistics_gen,
+          # infer_schema,
+          # validate_stats
       ],
       enable_cache=True,
       metadata_db_root=_metadata_db_root,
