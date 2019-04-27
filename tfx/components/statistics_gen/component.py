@@ -11,18 +11,18 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""TFX StatisticsGen component definition."""
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
+"""
+TFX StatisticsGen component definition.
+
+Docs reference for TFDV: https://www.tensorflow.org/tfx/guide/tfdv
+"""
+from __future__ import absolute_import, division, print_function
 
 from typing import Any, Dict, Text
 
-from tfx.components.base import base_component
-from tfx.components.base import base_driver
+from tfx.components.base import base_component, base_driver
 from tfx.components.statistics_gen import executor
-from tfx.utils import channel
-from tfx.utils import types
+from tfx.utils import channel, types
 
 
 class StatisticsGen(base_component.BaseComponent):
@@ -30,7 +30,6 @@ class StatisticsGen(base_component.BaseComponent):
 
   The StatisticsGen component wraps Tensorflow Data Validation (tfdv) to
   generate stats for every slice of input examples.
-
 
   Attributes:
     outputs: A ComponentOutputs including following keys:
