@@ -66,8 +66,8 @@ def _create_pipeline():
   infer_schema = SchemaGen(stats=statistics_gen.outputs.output)
 
   # # Performs anomaly detection based on statistics and data schema.
-  # validate_stats = ExampleValidator(
-  #     stats=statistics_gen.outputs.output, schema=infer_schema.outputs.output)
+  validate_stats = ExampleValidator(
+      stats=statistics_gen.outputs.output, schema=infer_schema.outputs.output)
 
   return pipeline.Pipeline(
       pipeline_name='mnist',
@@ -76,7 +76,7 @@ def _create_pipeline():
           example_gen,
           statistics_gen,
           infer_schema,
-          # validate_stats
+          validate_stats
       ],
       enable_cache=True,
       metadata_db_root=_metadata_db_root,
