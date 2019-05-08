@@ -32,11 +32,8 @@ tf.enable_eager_execution()
 TFRECORD_OUTFILE = 'mnist'
 
 FEATURE_DESCRIPTION = {
-    'height': tf.FixedLenFeature([], tf.int64, default_value=0),
-    'width': tf.FixedLenFeature([], tf.int64, default_value=0),
-    'depth': tf.FixedLenFeature([], tf.int64, default_value=0),
+    'image': tf.FixedLenFeature([], tf.int64, default_value=0),
     'label': tf.FixedLenFeature([], tf.int64, default_value=0),
-    'image_raw': tf.FixedLenFeature([], tf.string, default_value=''),
 }
 
 
@@ -165,17 +162,10 @@ def group_by_tf_example(key_value):
   height, width, depth = image.shape
   return tf.train.Example(features=tf.train.Features(
       feature={
-          'height': _int64_feature(height),
-          'width': _int64_feature(width),
-          'depth': _int64_feature(depth),
-          'label': _int64_feature(int(label)),
-          'image_raw': _bytes_feature(image.tostring())
+          'image': _int64_feature(np.reshape(image, (height*width*depth))),
+          'label': _int64_feature([int(label)]),
       }))
 
 
 def _int64_feature(value):
-  return tf.train.Feature(int64_list=tf.train.Int64List(value=[value]))
-
-
-def _bytes_feature(value):
-  return tf.train.Feature(bytes_list=tf.train.BytesList(value=[value]))
+  return tf.train.Feature(int64_list=tf.train.Int64List(value=value))

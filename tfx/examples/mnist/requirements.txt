@@ -1,6 +1,7 @@
 # airflow]
 export SLUGIFY_USES_TEXT_UNIDECODE=yes
 apache-airflow
+tensorflow-data-validation
 
 # mnist
 logzero
